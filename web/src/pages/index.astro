@@ -1,0 +1,13 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import FleetMap from '../components/map/FleetMap';
+import AuthGuard from '../components/auth/AuthGuard';
+---
+
+<DashboardLayout currentPage="mapa">
+  <AuthGuard client:load>
+    <main class="h-[calc(100vh-3.5rem)] overflow-hidden">
+      <FleetMap client:only="react" />
+    </main>
+  </AuthGuard>
+</DashboardLayout>

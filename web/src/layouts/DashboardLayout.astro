@@ -1,0 +1,124 @@
+---
+import Header from '../components/layout/Header';
+
+interface Props {
+  title?: string;
+  description?: string;
+  currentPage?: 'mapa' | 'unidades' | 'login';
+}
+
+const {
+  title = 'Voltianix — Monitoreo Inteligente de Flotas Eléctricas',
+  description = 'Plataforma de gestión y monitoreo en tiempo real para flotas de vehículos eléctricos. Visualiza estado operativo, batería, autonomía y ubicación.',
+  currentPage = 'mapa',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/assets/Logo1.png" />
+    <link rel="icon" href="/assets/Logo1.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://tile.openstreetmap.org" />
+
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-white font-sans antialiased">
+    <Header currentPage={currentPage} client:load />
+    <div class="pt-14 min-h-screen">
+      <slot />
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  @import "tailwindcss";
+
+  /* Design Tokens (Base) */
+  :root {
+    /* Colores globales */
+    --color-text: #1E1E1E;
+    --color-accent: #16A34A;
+    --color-button: #2563EB;
+    --color-secondary: #616161;
+    --color-surface: #FFFFFF;
+
+    /* Estados operativos */
+    --status-en-ruta: #45BC75;
+    --status-cargando: #6155F5;
+    --status-mantenimiento: #F17F1B;
+    --status-alerta: #F53131;
+
+    /* Batería */
+    --battery-high: #45BC75;
+    --battery-medium: #F5C731;
+    --battery-low: #F53131;
+
+    /* General */
+    --color-border: #E6E6E6;
+    --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    margin: 0;
+    padding: 0;
+  }
+
+  a { text-decoration: none; }
+
+  /* Animaciones */
+  @keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes batteryFill {
+    from { transform: scaleX(0); transform-origin: left; }
+    to { transform: scaleX(1); transform-origin: left; }
+  }
+
+  .animate-slide-in-left { animation: slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-fade-in { animation: fadeIn 0.2s ease both; }
+  .animate-battery-fill { animation: batteryFill 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+
+  /* Ajustes de Leaflet */
+  .leaflet-container { font-family: var(--font-sans) !important; }
+  .leaflet-control-attribution {
+    font-size: 10px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    padding: 2px 6px !important;
+  }
+  .leaflet-control-attribution a { color: var(--color-secondary) !important; }
+  .leaflet-control-zoom { display: none !important; }
+  .leaflet-marker-icon { transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  /* Barra de desplazamiento */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-slide-in-left, .animate-fade-in, .animate-battery-fill { animation: none !important; }
+    .leaflet-marker-icon { transition: none !important; }
+  }
+</style>

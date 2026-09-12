@@ -1,0 +1,33 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import GuestOnly from '../components/auth/GuestOnly';
+import LoginForm from '../components/auth/LoginForm';
+---
+
+<DashboardLayout title="Login — Voltianix" currentPage="login">
+  <GuestOnly client:load>
+    <main class="min-h-screen bg-[#F4F7FA] p-5 font-['Poppins']">
+      <div class="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[1400px] overflow-hidden rounded-[32px] border border-[#E6E6E6] bg-white shadow-[0_40px_120px_-40px_rgba(0,0,0,0.18)] lg:grid lg:grid-cols-[1.05fr_0.95fr]">
+        <section class="relative hidden h-full overflow-hidden lg:block">
+          <img src="/assets/Background.jpg" alt="Van Eléctrica Voltianix" class="absolute inset-0 h-full w-full object-cover" />
+          <div class="absolute inset-0 bg-[#0f172a]/40" />
+          <div class="absolute bottom-12 left-10 right-10 text-white">
+            <span class="mb-3 inline-flex rounded-full bg-[#16A34A]/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[#E5F7EA]">
+              Monitoreo de Flotas
+            </span>
+            <h2 class="mt-4 max-w-[540px] text-[2.75rem] font-semibold leading-[1.05]">
+              La nueva generación en gestión de movilidad eléctrica.
+            </h2>
+            <p class="mt-5 max-w-[520px] text-sm leading-relaxed text-white/80">
+              Supervisa tu flota en tiempo real, controla la batería de cada unidad y optimiza las operaciones desde una plataforma inteligente.
+            </p>
+          </div>
+        </section>
+
+        <section class="flex items-center justify-center bg-[#F4F7FA] px-6 py-10 sm:px-12 lg:px-14">
+          <LoginForm client:load />
+        </section>
+      </div>
+    </main>
+  </GuestOnly>
+</DashboardLayout>
