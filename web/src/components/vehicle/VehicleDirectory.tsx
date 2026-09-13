@@ -12,7 +12,8 @@ const batteryOptions: { key: BatteryLevel; label: string }[] = [
   { key: "low", label: "Bajo (0% - 29%)" },
 ];
 
-const selectClassName = "h-[30px] rounded border-0 bg-[#666] px-2.5 text-[10px] font-bold text-white outline-none";
+const focusRing = "focus-visible:ring-2 focus-visible:ring-[#2563EB]/40";
+const selectClassName = `h-[30px] rounded border-0 bg-[#616161] px-2.5 text-[11px] font-bold text-white outline-none ${focusRing}`;
 
 interface VehicleDirectoryProps {
   onVehicleClick?: (vehicle: Vehicle) => void;
@@ -26,6 +27,8 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
   const [type, setType] = useState<VehicleType | "">("");
   const [highlightedVehicleId, setHighlightedVehicleId] = useState<string | null>(null);
 
+  const hasFilters = Boolean(query.trim() || status || battery || type);
+
   const filteredVehicles = useMemo(() => {
     const search = query.trim().toLowerCase();
 
@@ -38,6 +41,13 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
       return haystack.includes(search);
     });
   }, [query, status, battery, type, vehicles]);
+
+  const clearFilters = () => {
+    setQuery("");
+    setStatus("");
+    setBattery("");
+    setType("");
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -60,8 +70,13 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
 
   return (
     <section className="w-full">
-      <div className="mb-5 flex flex-wrap items-center gap-2">
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar Unidad" aria-label="Buscar unidad" className="h-[30px] w-full max-w-[340px] rounded border border-[#dfdfdf] bg-white px-3 text-[10px] outline-none focus:border-[#2f75ff]" />
+      <h1 className="text-xl font-semibold text-[#1E1E1E]">Monitoreo de todas las Unidades</h1>
+      <p className="mt-1 max-w-2xl text-sm text-[#4E4E4E]">
+        Consulta el estado operativo, la batería, la ubicación y las alertas de cada unidad de la flota.
+      </p>
+
+      <div className="mb-5 mt-4 flex flex-wrap items-center gap-2">
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar Unidad" aria-label="Buscar unidad" className={`h-[30px] w-full max-w-[340px] rounded border border-[#dfdfdf] bg-white px-3 text-[11px] outline-none focus:border-[#2f75ff] ${focusRing}`} />
         <select value={status} onChange={(event) => setStatus(event.target.value as VehicleStatus | "")} aria-label="Estado operativo" className={selectClassName}>
           <option value="">Estado Operativo</option>
           {statusOptions.map((option) => <option key={option} value={option}>{getStatusLabel(option)}</option>)}
@@ -86,7 +101,20 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
             onClick={onVehicleClick}
           />
         ))}
-        {filteredVehicles.length === 0 && <p className="col-span-full py-10 text-center text-sm text-[#555]">No encontramos unidades.</p>}
+        {filteredVehicles.length === 0 && (
+          <div className="col-span-full flex flex-col items-center gap-3 py-10 text-center text-sm text-[#4E4E4E]">
+            {hasFilters ? (
+              <>
+                <p>Ninguna unidad coincide con la búsqueda o los filtros. Quita algún filtro para ver más unidades.</p>
+                <button type="button" onClick={clearFilters} className={`rounded-[5px] bg-[#2563EB] px-4 py-1.5 text-xs font-semibold text-white outline-none transition-opacity hover:opacity-90 ${focusRing}`}>
+                  Limpiar filtros
+                </button>
+              </>
+            ) : (
+              <p>Aún no hay unidades registradas en la flota.</p>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

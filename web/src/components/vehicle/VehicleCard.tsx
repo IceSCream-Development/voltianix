@@ -24,7 +24,7 @@ function Icon({ name }: { name: "user" | "battery" | "bolt" | "pin" | "clock" | 
   } as const;
 
   return (
-    <svg aria-hidden="true" className="h-2.5 w-2.5" viewBox="0 0 16 16" fill="currentColor">
+    <svg aria-hidden="true" className="h-3 w-3" viewBox="0 0 16 16" fill="currentColor">
       <path d={paths[name]} />
     </svg>
   );
@@ -34,12 +34,12 @@ function Detail({ icon, label, value }: { icon: "user" | "bolt" | "pin" | "clock
   if (value === undefined || value === "") return null;
 
   return (
-    <div className="mt-2 text-[9.5px] leading-tight">
+    <div className="mt-2 text-[11px] leading-tight">
       <span className="flex items-center gap-1.5 font-semibold">
         <Icon name={icon} />
         {label}
       </span>
-      <span className="ml-3.5 block text-[8.5px] text-[#5c5c5c]">{value}</span>
+      <span className="ml-[18px] block text-[10px] text-[#4E4E4E]">{value}</span>
     </div>
   );
 }
@@ -55,20 +55,22 @@ export default function VehicleCard({
   className = "",
 }: VehicleCardProps) {
   const { batteryColor, statusColor, typeLabel, alerts } = getVehicleCardViewModel(vehicle);
+  // Solo se "levanta" al pasar el mouse si la tarjeta realmente hace algo al hacer clic
+  const interactive = onClick ? "cursor-pointer hover:-translate-y-0.5 hover:shadow-lg" : "";
 
   return (
     <article
       id={cardId}
       tabIndex={cardId ? -1 : undefined}
-      className={`relative min-h-[248px] overflow-hidden rounded-[10px] border bg-white py-3 pl-6 pr-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${isHighlighted ? "border-[#2563EB] ring-2 ring-[#2563EB]/30" : "border-[#e0e0e0]"} ${className}`.trim()}
+      className={`relative min-h-[248px] overflow-hidden rounded-[10px] border bg-white py-3 pl-6 pr-3 shadow-sm transition-all ${interactive} ${isHighlighted ? "border-[#2563EB] ring-2 ring-[#2563EB]/30" : "border-[#e0e0e0]"} ${className}`.trim()}
       onClick={() => onClick?.(vehicle)}
     >
       <span className="absolute bottom-3 left-2.5 top-3 w-0.5 rounded" style={{ backgroundColor: statusColor }} />
-      <div className="flex items-center justify-between text-[11px] leading-none">
+      <div className="flex items-center justify-between text-[13px] leading-none">
         <strong>{vehicle.label}</strong>
         <div className="flex items-center gap-2">
           {action}
-          {alerts.length > 0 && <span className="grid h-3.5 w-3.5 place-items-center rounded-full bg-[#ff424d] text-[9px] font-extrabold text-white">{alerts.length}</span>}
+          {alerts.length > 0 && <span className="grid h-4 w-4 place-items-center rounded-full bg-[#F53131] text-[10px] font-extrabold text-white">{alerts.length}</span>}
           {onClose && (
             <button
               type="button"
@@ -86,24 +88,24 @@ export default function VehicleCard({
           )}
         </div>
       </div>
-      <div className="flex justify-between border-b border-[#bcbcbc] py-1 text-[10px]">
+      <div className="flex justify-between border-b border-[#bcbcbc] py-1 text-[11px]">
         <span>{vehicle.model}</span>
         <span className="underline underline-offset-2">{typeLabel}</span>
       </div>
       <Detail icon="user" label="Usuario" value={vehicle.driver} />
-      <div className="mt-2 text-[9.5px] leading-tight">
+      <div className="mt-2 text-[11px] leading-tight">
         <span className="flex items-center gap-1.5 font-semibold"><Icon name="battery" /> Batería</span>
-        <div className="ml-3.5 mt-0.5 flex items-center gap-1.5">
+        <div className="ml-[18px] mt-0.5 flex items-center gap-1.5">
           <div className="h-1 flex-1 overflow-hidden rounded bg-[#d9d9d9]"><span className="block h-full rounded" style={{ width: `${vehicle.battery}%`, background: batteryColor }} /></div>
-          <span className="w-5 text-[8px] text-[#777]">{vehicle.battery}%</span>
+          <span className="w-7 text-right text-[10px] text-[#4E4E4E]">{vehicle.battery}%</span>
         </div>
       </div>
       <Detail icon="bolt" label="Autonomía Restante" value={`${vehicle.autonomy} km`} />
       <Detail icon="pin" label="Ubicación" value={vehicle.location.address} />
       <Detail icon="clock" label="Actualizado hace" value={vehicle.lastUpdate} />
-      <div className={`mt-1.5 text-[9.5px] leading-tight ${alerts.length ? "text-[#ff424d]" : ""}`}>
+      <div className={`mt-2 text-[11px] leading-tight ${alerts.length ? "text-[#F53131]" : ""}`}>
         <span className="flex items-center gap-1.5 font-semibold"><Icon name="alert" /> {alerts.length ? "Alertas" : "Sin Alertas"}</span>
-        {alerts.map((alert) => <span className="ml-3.5 block text-[8px] text-[#686868]" key={alert}>{alert}</span>)}
+        {alerts.map((alert) => <span className="ml-[18px] block text-[10px] text-[#4E4E4E]" key={alert}>{alert}</span>)}
       </div>
       {onViewDetails && (
         <button
@@ -112,7 +114,7 @@ export default function VehicleCard({
             event.stopPropagation();
             onViewDetails(vehicle.id);
           }}
-          className="mt-3 w-full rounded-md bg-[#2563EB] py-1.5 text-[10px] font-semibold text-white transition-opacity hover:opacity-90"
+          className="mt-3 w-full rounded-[5px] bg-[#2563EB] py-1.5 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
         >
           Ver Detalles
         </button>

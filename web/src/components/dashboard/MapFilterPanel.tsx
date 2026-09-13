@@ -16,7 +16,7 @@ const statusOptions: { key: VehicleStatus; label: string; color: string }[] = [
 
 const batteryOptions: { key: BatteryLevel; label: string; color: string }[] = [
   { key: 'high', label: 'Más del 70%', color: '#45BC75' },
-  { key: 'medium', label: '30% - 70%', color: '#F5C731' },
+  { key: 'medium', label: '30% - 70%', color: '#FFCC00' },
   { key: 'low', label: 'Menos del 30%', color: '#F53131' },
 ];
 
@@ -24,7 +24,7 @@ const typeOptions: { key: VehicleType; label: string; color: string }[] = [
   { key: 'automovil', label: 'Automóvil', color: '#6155F5' },
   { key: 'van', label: 'Van', color: '#45BC75' },
   { key: 'camion', label: 'Camión', color: '#F17F1B' },
-  { key: 'motocicleta', label: 'Motocicleta', color: '#F5C731' },
+  { key: 'motocicleta', label: 'Motocicleta', color: '#FFCC00' },
 ];
 
 export default function MapFilterPanel({ vehicles, activeCategory, onCategoryChange }: MapFilterPanelProps) {

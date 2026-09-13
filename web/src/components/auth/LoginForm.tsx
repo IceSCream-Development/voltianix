@@ -25,9 +25,10 @@ export default function LoginForm() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
-        <h1 className="mt-6 text-[2.25rem] font-semibold text-[#1E1E1E]">Bienvenido a Voltianix</h1>
-        <p className="mt-3 text-sm leading-relaxed text-[#616161]">
-          Ingresa con tu correo y contraseña para supervisar la operación de tu flota eléctrica.
+        <h1 className="mt-6 text-[2.25rem] font-semibold text-[#1E1E1E]">¡Bienvenido de Vuelta!</h1>
+        <p className="mt-3 text-sm leading-relaxed text-[#4E4E4E]">
+          Ingresa con tu email empresarial y contraseña para supervisar la operación de{' '}
+          <span className="font-semibold text-[#16A34A]">tu flota eléctrica</span>.
         </p>
       </div>
 
@@ -40,7 +41,7 @@ export default function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[#1E1E1E]">
-            Email
+            Email empresarial
           </label>
           <input
             id="email"
@@ -95,7 +96,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-full bg-[#16A34A] text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center rounded-[5px] bg-[#2563EB] text-sm font-semibold text-white transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? 'Iniciando sesión…' : 'Iniciar sesión'}
         </button>

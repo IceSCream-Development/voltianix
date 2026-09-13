@@ -61,7 +61,7 @@ export function getStatusColor(status: VehicleStatus): string {
 export function getBatteryColor(level: BatteryLevel): string {
   const colors: Record<BatteryLevel, string> = {
     high: '#45BC75',
-    medium: '#F5C731',
+    medium: '#FFCC00',
     low: '#F53131',
   };
   return colors[level];
@@ -73,7 +73,7 @@ export function getTypeColor(type: VehicleType): string {
     automovil: '#6155F5',
     van: '#45BC75',
     camion: '#F17F1B',
-    motocicleta: '#F5C731',
+    motocicleta: '#FFCC00',
   };
   return colors[type];
 }
