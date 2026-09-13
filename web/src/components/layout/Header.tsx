@@ -35,7 +35,7 @@ export default function Header({ currentPage = 'mapa' }: HeaderProps) {
     >
       <div className="flex items-center w-52 min-w-[160px]">
         <img
-          src="/assets/Logo2.png"
+          src="/assets/Logo1.png"
           alt="Voltianix"
           className="h-10 w-auto object-contain drop-shadow-sm"
         />
