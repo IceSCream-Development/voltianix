@@ -16,7 +16,10 @@ export interface Vehicle {
     lng: number;
     address: string;
   };
+  /* Tiempo relativo sin el "Hace" (p. ej. "5s", "2 min"); la tarjeta ya muestra "Actualizado hace" */
   lastUpdate: string;
+  /* Historial de eventos de la unidad (p. ej. "[10:49 AM] Entrada a Zona Peligrosa") */
+  alerts?: string[];
 }
 
 export function getBatteryLevel(battery: number): BatteryLevel {
@@ -88,6 +91,7 @@ export function getVehicleColor(vehicle: Vehicle, category: ColorCategory): stri
   }
 }
 
+/* Alertas calculadas del estado actual primero, luego el historial de eventos de la unidad */
 export function getVehicleAlerts(vehicle: Vehicle): string[] {
   const alerts: string[] = [];
   if (vehicle.status === 'mantenimiento') {
@@ -95,6 +99,9 @@ export function getVehicleAlerts(vehicle: Vehicle): string[] {
   }
   if (vehicle.battery <= 20) {
     alerts.push('Batería crítica');
+  }
+  for (const alert of vehicle.alerts ?? []) {
+    if (!alerts.includes(alert)) alerts.push(alert);
   }
   return alerts;
 }

@@ -1,25 +1,16 @@
 import type { ReactNode } from "react";
-
-export type VehicleStatus = "En Ruta" | "Cargando" | "En Mantenimiento";
-
-export interface Vehicle {
-  id: string;
-  model?: string;
-  type?: string;
-  owner?: string;
-  battery: number;
-  range?: number;
-  location?: string;
-  updated?: string;
-  status?: VehicleStatus;
-  alerts?: string[];
-  accent?: "green" | "orange" | "purple";
-}
+import type { Vehicle } from "../../types/vehicle";
+import { getVehicleCardViewModel } from "../../types/vehicle";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
   onClick?: (vehicle: Vehicle) => void;
   action?: ReactNode;
+  onClose?: () => void;
+  onViewDetails?: (vehicleId: string) => void;
+  cardId?: string;
+  isHighlighted?: boolean;
+  className?: string;
 }
 
 function Icon({ name }: { name: "user" | "battery" | "bolt" | "pin" | "clock" | "alert" }) {
@@ -53,43 +44,79 @@ function Detail({ icon, label, value }: { icon: "user" | "bolt" | "pin" | "clock
   );
 }
 
-export default function VehicleCard({ vehicle, onClick, action }: VehicleCardProps) {
-  const accent = vehicle.accent === "orange" ? "bg-[#ff8518]" : vehicle.accent === "purple" ? "bg-[#635bff]" : "bg-[#46c27b]";
-  const battery = vehicle.battery < 30 ? "#ff424d" : vehicle.battery < 70 ? "#ffc000" : "#47c27c";
-  const alerts = vehicle.alerts ?? [];
+export default function VehicleCard({
+  vehicle,
+  onClick,
+  action,
+  onClose,
+  onViewDetails,
+  cardId,
+  isHighlighted = false,
+  className = "",
+}: VehicleCardProps) {
+  const { batteryColor, statusColor, typeLabel, alerts } = getVehicleCardViewModel(vehicle);
 
   return (
     <article
-      className="relative min-h-[248px] overflow-hidden rounded-[10px] border border-[#e0e0e0] bg-white py-3 pl-6 pr-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+      id={cardId}
+      tabIndex={cardId ? -1 : undefined}
+      className={`relative min-h-[248px] overflow-hidden rounded-[10px] border bg-white py-3 pl-6 pr-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${isHighlighted ? "border-[#2563EB] ring-2 ring-[#2563EB]/30" : "border-[#e0e0e0]"} ${className}`.trim()}
       onClick={() => onClick?.(vehicle)}
     >
-      <span className={`absolute bottom-3 left-2.5 top-3 w-0.5 rounded ${accent}`} />
+      <span className="absolute bottom-3 left-2.5 top-3 w-0.5 rounded" style={{ backgroundColor: statusColor }} />
       <div className="flex items-center justify-between text-[11px] leading-none">
-        <strong>{vehicle.id}</strong>
+        <strong>{vehicle.label}</strong>
         <div className="flex items-center gap-2">
           {action}
           {alerts.length > 0 && <span className="grid h-3.5 w-3.5 place-items-center rounded-full bg-[#ff424d] text-[9px] font-extrabold text-white">{alerts.length}</span>}
+          {onClose && (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onClose();
+              }}
+              className="grid h-5 w-5 place-items-center rounded-full text-[#616161] transition-colors hover:bg-gray-100"
+              aria-label="Cerrar tarjeta"
+            >
+              <svg aria-hidden="true" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
       <div className="flex justify-between border-b border-[#bcbcbc] py-1 text-[10px]">
-        <span>{vehicle.model ?? "Ford E-Transit"}</span>
-        <span className="underline underline-offset-2">{vehicle.type ?? "Van"}</span>
+        <span>{vehicle.model}</span>
+        <span className="underline underline-offset-2">{typeLabel}</span>
       </div>
-      <Detail icon="user" label="Usuario" value={vehicle.owner} />
+      <Detail icon="user" label="Usuario" value={vehicle.driver} />
       <div className="mt-2 text-[9.5px] leading-tight">
         <span className="flex items-center gap-1.5 font-semibold"><Icon name="battery" /> Batería</span>
         <div className="ml-3.5 mt-0.5 flex items-center gap-1.5">
-          <div className="h-1 flex-1 overflow-hidden rounded bg-[#d9d9d9]"><span className="block h-full rounded" style={{ width: `${vehicle.battery}%`, background: battery }} /></div>
+          <div className="h-1 flex-1 overflow-hidden rounded bg-[#d9d9d9]"><span className="block h-full rounded" style={{ width: `${vehicle.battery}%`, background: batteryColor }} /></div>
           <span className="w-5 text-[8px] text-[#777]">{vehicle.battery}%</span>
         </div>
       </div>
-      <Detail icon="bolt" label="Autonomía Restante" value={vehicle.range ? `${vehicle.range} km` : undefined} />
-      <Detail icon="pin" label="Ubicación" value={vehicle.location} />
-      <Detail icon="clock" label="Actualizado hace" value={vehicle.updated} />
+      <Detail icon="bolt" label="Autonomía Restante" value={`${vehicle.autonomy} km`} />
+      <Detail icon="pin" label="Ubicación" value={vehicle.location.address} />
+      <Detail icon="clock" label="Actualizado hace" value={vehicle.lastUpdate} />
       <div className={`mt-1.5 text-[9.5px] leading-tight ${alerts.length ? "text-[#ff424d]" : ""}`}>
         <span className="flex items-center gap-1.5 font-semibold"><Icon name="alert" /> {alerts.length ? "Alertas" : "Sin Alertas"}</span>
         {alerts.map((alert) => <span className="ml-3.5 block text-[8px] text-[#686868]" key={alert}>{alert}</span>)}
       </div>
+      {onViewDetails && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onViewDetails(vehicle.id);
+          }}
+          className="mt-3 w-full rounded-md bg-[#2563EB] py-1.5 text-[10px] font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          Ver Detalles
+        </button>
+      )}
     </article>
   );
 }

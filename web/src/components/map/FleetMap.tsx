@@ -162,6 +162,7 @@ export default function FleetMap() {
             vehicle={selectedVehicle}
             onClose={handleCloseCard}
             onViewDetails={handleViewDetails}
+            className="w-72"
           />
         </div>
       )}

@@ -44,17 +44,19 @@ function mapFirestoreToVehicle(doc: FirestoreVehicle): Vehicle {
     : doc.status === 'cargando' ? 'cargando'
     : 'mantenimiento';
 
-  // lastUpdate puede ser un timestamp de Firestore o Date
-  let lastUpdate = 'Hace un momento';
+  // lastUpdate puede ser un timestamp de Firestore o Date.
+  // Se guarda como tiempo relativo sin "Hace" porque la tarjeta ya muestra "Actualizado hace".
+  let lastUpdate = 'un momento';
   if (doc.lastUpdate) {
     const ts =
       typeof doc.lastUpdate === 'object' && 'seconds' in doc.lastUpdate
         ? new Date(doc.lastUpdate.seconds * 1000)
         : new Date(doc.lastUpdate);
-    lastUpdate = ts.toLocaleTimeString('es-MX', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    const seconds = Math.max(0, Math.round((Date.now() - ts.getTime()) / 1000));
+    if (seconds < 60) lastUpdate = `${seconds}s`;
+    else if (seconds < 3600) lastUpdate = `${Math.floor(seconds / 60)} min`;
+    else if (seconds < 86400) lastUpdate = `${Math.floor(seconds / 3600)} h`;
+    else lastUpdate = `${Math.floor(seconds / 86400)} d`;
   }
 
   return {
@@ -84,7 +86,8 @@ export function useVehicles(): Vehicle[] {
   );
 
   useEffect(() => {
-    if (USE_MOCK) return;
+    // Sin configuración de Firebase no hay base de datos a la cual suscribirse
+    if (USE_MOCK || !db) return;
 
     // Modo Firebase: suscripción en tiempo real a la colección "vehicles"
     const unsubscribe = onSnapshot(

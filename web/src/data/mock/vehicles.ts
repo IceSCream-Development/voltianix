@@ -15,7 +15,7 @@ export const mockVehicles: Vehicle[] = [
       lng: -102.2916,
       address: 'Av. Adolfo López Mateos 101, Centro, Aguascalientes',
     },
-    lastUpdate: 'Hace 2 min',
+    lastUpdate: '5s',
   },
   {
     id: '2',
@@ -31,7 +31,8 @@ export const mockVehicles: Vehicle[] = [
       lng: -102.3145,
       address: 'Blvd. Luis Donaldo Colosio 420, Jardines de la Cruz, Aguascalientes',
     },
-    lastUpdate: 'Hace 5 min',
+    lastUpdate: '4s',
+    alerts: ['[10:31 AM] Inicio de Carga en Estación Colosio'],
   },
   {
     id: '3',
@@ -47,7 +48,8 @@ export const mockVehicles: Vehicle[] = [
       lng: -102.2780,
       address: 'Av. Aguascalientes Norte 600, Pulgas Pandas Norte, Aguascalientes',
     },
-    lastUpdate: 'Hace 1 min',
+    lastUpdate: '3s',
+    alerts: ['[10:49 AM] Entrada a Zona Peligrosa', '[10:12 AM] Desvío de Ruta Asignada'],
   },
   {
     id: '4',
@@ -63,7 +65,8 @@ export const mockVehicles: Vehicle[] = [
       lng: -102.2840,
       address: 'Av. Convención de 1914 Sur 205, La Fuente, Aguascalientes',
     },
-    lastUpdate: 'Hace 4 min',
+    lastUpdate: '6s',
+    alerts: ['[10:44 AM] Exceso de Velocidad (92 km/h)'],
   },
   {
     id: '5',
@@ -79,7 +82,8 @@ export const mockVehicles: Vehicle[] = [
       lng: -102.3050,
       address: 'Av. Héroe de Nacozari 1200, Gremial, Aguascalientes',
     },
-    lastUpdate: 'Hace 15 min',
+    lastUpdate: '15 min',
+    alerts: ['[09:15 AM] Falla en Sistema de Frenos'],
   },
   {
     id: '6',
@@ -95,7 +99,7 @@ export const mockVehicles: Vehicle[] = [
       lng: -102.2680,
       address: 'Av. Tecnológico 100, Ojocaliente, Aguascalientes',
     },
-    lastUpdate: 'Hace 3 min',
+    lastUpdate: '3s',
   },
   {
     id: '7',
@@ -111,7 +115,8 @@ export const mockVehicles: Vehicle[] = [
       lng: -102.3200,
       address: 'Blvd. a Zacatecas 850, Desarrollo Especial Ags, Aguascalientes',
     },
-    lastUpdate: 'Hace 8 min',
+    lastUpdate: '8s',
+    alerts: ['[10:25 AM] Carga Completada'],
   },
   {
     id: '8',
@@ -127,6 +132,7 @@ export const mockVehicles: Vehicle[] = [
       lng: -102.2550,
       address: 'Carr. Panamericana Sur Km 5, Zona Industrial, Aguascalientes',
     },
-    lastUpdate: 'Hace 20 min',
+    lastUpdate: '20 min',
+    alerts: ['[08:30 AM] Servicio Programado de Batería'],
   },
 ];
