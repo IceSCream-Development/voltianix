@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useLogin } from '../../hooks/useLogin';
-import { TEMP_USER_CREDENTIALS } from '../../lib/auth';
+import { TEMP_USER_CREDENTIALS, getPostLoginPath } from '../../lib/auth';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -13,7 +13,8 @@ export default function LoginForm() {
     event.preventDefault();
     const success = await login(email, password);
     if (success) {
-      window.location.assign('/');
+      // replace: el login no queda en el historial
+      window.location.replace(getPostLoginPath());
     }
   };
 

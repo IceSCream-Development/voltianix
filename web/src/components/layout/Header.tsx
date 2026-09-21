@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { clearStoredUser, getStoredUser, type AuthUser } from '../../lib/auth';
+import { LOGIN_PATH, clearStoredUser, getStoredUser, type AuthUser } from '../../lib/auth';
 
 interface HeaderProps {
   currentPage?: 'mapa' | 'unidades' | 'dashboard' | 'login';
@@ -25,7 +25,7 @@ export default function Header({ currentPage = 'mapa' }: HeaderProps) {
     clearStoredUser();
     setUser(null);
     window.dispatchEvent(new Event('auth:updated'));
-    window.location.assign('/login');
+    window.location.assign(LOGIN_PATH);
   };
 
   return (

@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { getStoredUser } from '../../lib/auth';
+import { getPostLoginPath, getStoredUser } from '../../lib/auth';
 
 interface GuestOnlyProps {
   children: ReactNode;
 }
 
+/* Sólo para visitantes sin sesión: si ya hay una, se va al mismo destino al que
+   llevaría enviar el formulario (el ?next= de la URL, o el mapa). */
 export default function GuestOnly({ children }: GuestOnlyProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const sync = () => {
       if (getStoredUser()) {
-        window.location.assign('/');
+        window.location.replace(getPostLoginPath());
       } else {
         setLoading(false);
       }
