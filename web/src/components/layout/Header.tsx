@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { clearStoredUser, getStoredUser, type AuthUser } from '../../lib/auth';
 
 interface HeaderProps {
-  currentPage?: 'mapa' | 'unidades' | 'login';
+  currentPage?: 'mapa' | 'unidades' | 'dashboard' | 'login';
 }
 
 export default function Header({ currentPage = 'mapa' }: HeaderProps) {
@@ -61,6 +61,16 @@ export default function Header({ currentPage = 'mapa' }: HeaderProps) {
           }`}
         >
           Unidades
+        </a>
+        <a
+          href="/dashboard"
+          className={`h-full flex items-center px-1 border-b-2 text-sm transition-colors ${
+            currentPage === 'dashboard'
+              ? 'font-semibold text-[#16A34A] border-[#16A34A]'
+              : 'font-medium text-[#1E1E1E] border-transparent hover:text-[#616161]'
+          }`}
+        >
+          Indicadores
         </a>
       </nav>
 

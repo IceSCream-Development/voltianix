@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useVehicles } from "../../hooks/useVehicles";
 import type { BatteryLevel, Vehicle, VehicleStatus, VehicleType } from "../../types/vehicle";
-import { getBatteryLevel, getStatusLabel, getTypeLabel } from "../../types/vehicle";
+import { getStatusLabel, getTypeLabel, hasActiveFilters, matchesVehicleFilters } from "../../types/vehicle";
 import VehicleCard from "./VehicleCard";
 
 const statusOptions: VehicleStatus[] = ["en-ruta", "cargando", "mantenimiento"];
@@ -27,20 +27,23 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
   const [type, setType] = useState<VehicleType | "">("");
   const [highlightedVehicleId, setHighlightedVehicleId] = useState<string | null>(null);
 
-  const hasFilters = Boolean(query.trim() || status || battery || type);
+  // Los selects son de valor único; el helper compartido trabaja con arreglos
+  const filters = useMemo(
+    () => ({
+      query,
+      statuses: status ? [status] : [],
+      batteryLevels: battery ? [battery] : [],
+      types: type ? [type] : [],
+    }),
+    [query, status, battery, type]
+  );
 
-  const filteredVehicles = useMemo(() => {
-    const search = query.trim().toLowerCase();
+  const hasFilters = hasActiveFilters(filters);
 
-    return vehicles.filter((vehicle) => {
-      if (status && vehicle.status !== status) return false;
-      if (battery && getBatteryLevel(vehicle.battery) !== battery) return false;
-      if (type && vehicle.type !== type) return false;
-
-      const haystack = `${vehicle.label} ${vehicle.driver} ${vehicle.model} ${vehicle.location.address}`.toLowerCase();
-      return haystack.includes(search);
-    });
-  }, [query, status, battery, type, vehicles]);
+  const filteredVehicles = useMemo(
+    () => vehicles.filter((vehicle) => matchesVehicleFilters(vehicle, filters)),
+    [vehicles, filters]
+  );
 
   const clearFilters = () => {
     setQuery("");

@@ -1,18 +1,27 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { Vehicle, ColorCategory } from '../../types/vehicle';
-import { getVehicleColor } from '../../types/vehicle';
+import type { BatteryLevel, Vehicle, VehicleStatus, VehicleType, ColorCategory } from '../../types/vehicle';
+import { getVehicleColor, hasActiveFilters, matchesVehicleFilters } from '../../types/vehicle';
 import { useVehicles } from '../../hooks/useVehicles';
 import VehicleMarkerComponent from './VehicleMarker';
 import SearchBar from '../dashboard/SearchBar';
 import MapFilterPanel from '../dashboard/MapFilterPanel';
 import VehicleCard from '../vehicle/VehicleCard';
 
+/* Agrega o quita un valor de la selección de un filtro */
+function toggleValue<T>(values: T[], value: T): T[] {
+  return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
+}
+
 /* Vuela hacia un vehículo cuando se selecciona */
 function FlyToVehicle({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
-  map.flyTo([lat, lng], 15, { duration: 0.8 });
+
+  useEffect(() => {
+    map.flyTo([lat, lng], 15, { duration: 0.8 });
+  }, [map, lat, lng]);
+
   return null;
 }
 
@@ -71,17 +80,34 @@ export default function FleetMap() {
   const [showFilters, setShowFilters] = useState(true);
   const [activeCategory, setActiveCategory] = useState<ColorCategory>(null);
 
-  const filteredVehicles = useMemo(() => {
-    if (!searchQuery) return vehicles;
+  // Filtros del panel lateral
+  const [selectedStatuses, setSelectedStatuses] = useState<VehicleStatus[]>([]);
+  const [selectedBatteryLevels, setSelectedBatteryLevels] = useState<BatteryLevel[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<VehicleType[]>([]);
 
-    const query = searchQuery.toLowerCase();
-    return vehicles.filter((vehicle) => {
-      const haystack = `${vehicle.label} ${vehicle.driver} ${vehicle.model} ${vehicle.location.address}`.toLowerCase();
-      return haystack.includes(query);
-    });
-  }, [searchQuery, vehicles]);
+  const filters = useMemo(
+    () => ({
+      query: searchQuery,
+      statuses: selectedStatuses,
+      batteryLevels: selectedBatteryLevels,
+      types: selectedTypes,
+    }),
+    [searchQuery, selectedStatuses, selectedBatteryLevels, selectedTypes]
+  );
 
-  const totalCount = vehicles.length;
+  const filteredVehicles = useMemo(
+    () => vehicles.filter((vehicle) => matchesVehicleFilters(vehicle, filters)),
+    [vehicles, filters]
+  );
+
+  const hasFilters = hasActiveFilters(filters);
+
+  // Si la unidad seleccionada deja de ser visible, se cierra su tarjeta
+  useEffect(() => {
+    if (selectedVehicle && !filteredVehicles.some((vehicle) => vehicle.id === selectedVehicle.id)) {
+      setSelectedVehicle(null);
+    }
+  }, [filteredVehicles, selectedVehicle]);
 
   // Manejadores
   const handleMarkerClick = useCallback((vehicle: Vehicle) => {
@@ -100,6 +126,25 @@ export default function FleetMap() {
 
   const toggleFilters = useCallback(() => {
     setShowFilters((prev) => !prev);
+  }, []);
+
+  const handleStatusToggle = useCallback((status: VehicleStatus) => {
+    setSelectedStatuses((prev) => toggleValue(prev, status));
+  }, []);
+
+  const handleBatteryToggle = useCallback((level: BatteryLevel) => {
+    setSelectedBatteryLevels((prev) => toggleValue(prev, level));
+  }, []);
+
+  const handleTypeToggle = useCallback((type: VehicleType) => {
+    setSelectedTypes((prev) => toggleValue(prev, type));
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setSearchQuery('');
+    setSelectedStatuses([]);
+    setSelectedBatteryLevels([]);
+    setSelectedTypes([]);
   }, []);
 
   // Centro de Aguascalientes, México
@@ -148,8 +193,17 @@ export default function FleetMap() {
           <div className="max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain pr-1">
             <MapFilterPanel
               vehicles={vehicles}
+              visibleCount={filteredVehicles.length}
               activeCategory={activeCategory}
               onCategoryChange={setActiveCategory}
+              selectedStatuses={selectedStatuses}
+              selectedBatteryLevels={selectedBatteryLevels}
+              selectedTypes={selectedTypes}
+              onStatusToggle={handleStatusToggle}
+              onBatteryToggle={handleBatteryToggle}
+              onTypeToggle={handleTypeToggle}
+              onClearFilters={handleClearFilters}
+              hasFilters={hasFilters}
             />
           </div>
         )}

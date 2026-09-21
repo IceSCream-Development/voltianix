@@ -116,3 +116,43 @@ export function getVehicleCardViewModel(vehicle: Vehicle) {
     alerts: getVehicleAlerts(vehicle),
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* Filtros de flota (compartidos por el mapa y el directorio)          */
+/* ------------------------------------------------------------------ */
+
+export interface VehicleFilters {
+  query?: string;
+  statuses?: VehicleStatus[];
+  batteryLevels?: BatteryLevel[];
+  types?: VehicleType[];
+}
+
+/* Texto sobre el que busca la barra de búsqueda */
+function getSearchHaystack(vehicle: Vehicle): string {
+  return `${vehicle.label} ${vehicle.driver} ${vehicle.model} ${vehicle.location.address}`.toLowerCase();
+}
+
+/* Arreglo vacío u omitido = sin filtrar por esa dimensión.
+   Entre dimensiones se combina con AND; dentro de una dimensión, con OR. */
+export function matchesVehicleFilters(vehicle: Vehicle, filters: VehicleFilters): boolean {
+  const { query, statuses, batteryLevels, types } = filters;
+
+  if (statuses?.length && !statuses.includes(vehicle.status)) return false;
+  if (types?.length && !types.includes(vehicle.type)) return false;
+  if (batteryLevels?.length && !batteryLevels.includes(getBatteryLevel(vehicle.battery))) return false;
+
+  const search = query?.trim().toLowerCase();
+  if (search && !getSearchHaystack(vehicle).includes(search)) return false;
+
+  return true;
+}
+
+export function hasActiveFilters(filters: VehicleFilters): boolean {
+  return Boolean(
+    filters.query?.trim() ||
+      filters.statuses?.length ||
+      filters.batteryLevels?.length ||
+      filters.types?.length
+  );
+}
