@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { Vehicle, VehicleStatus, VehicleType, BatteryLevel, ColorCategory } from '../../types/vehicle';
-import { getBatteryColor, getStatusColor, getTypeColor } from '../../types/vehicle';
 import { getFleetMetrics } from '../../lib/fleetMetrics';
+import { batteryOptions, statusOptions, typeOptions } from '../../lib/filterOptions';
 
 type Category = Exclude<ColorCategory, null>;
 
@@ -20,25 +20,6 @@ interface MapFilterPanelProps {
   onClearFilters: () => void;
   hasFilters: boolean;
 }
-
-const statusOptions: { key: VehicleStatus; label: string }[] = [
-  { key: 'en-ruta', label: 'En Ruta' },
-  { key: 'cargando', label: 'Cargando' },
-  { key: 'mantenimiento', label: 'En Mantenimiento' },
-];
-
-const batteryOptions: { key: BatteryLevel; label: string }[] = [
-  { key: 'high', label: 'Más del 70%' },
-  { key: 'medium', label: '30% - 70%' },
-  { key: 'low', label: 'Menos del 30%' },
-];
-
-const typeOptions: { key: VehicleType; label: string }[] = [
-  { key: 'automovil', label: 'Automóvil' },
-  { key: 'van', label: 'Van' },
-  { key: 'camion', label: 'Camión' },
-  { key: 'motocicleta', label: 'Motocicleta' },
-];
 
 export default function MapFilterPanel({
   vehicles,
@@ -99,7 +80,7 @@ export default function MapFilterPanel({
           <FilterRow
             key={option.key}
             label={option.label}
-            dotColor={getStatusColor(option.key)}
+            dotColor={option.color}
             count={metrics.statusCounts[option.key]}
             selected={selectedStatuses.includes(option.key)}
             colored={activeCategory === 'status'}
@@ -117,7 +98,7 @@ export default function MapFilterPanel({
           <FilterRow
             key={option.key}
             label={option.label}
-            dotColor={getBatteryColor(option.key)}
+            dotColor={option.color}
             count={metrics.batteryCounts[option.key]}
             selected={selectedBatteryLevels.includes(option.key)}
             colored={activeCategory === 'battery'}
@@ -136,7 +117,7 @@ export default function MapFilterPanel({
           <FilterRow
             key={option.key}
             label={option.label}
-            dotColor={getTypeColor(option.key)}
+            dotColor={option.color}
             count={metrics.typeCounts[option.key]}
             selected={selectedTypes.includes(option.key)}
             colored={activeCategory === 'type'}

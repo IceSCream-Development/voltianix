@@ -8,11 +8,7 @@ import VehicleMarkerComponent from './VehicleMarker';
 import SearchBar from '../dashboard/SearchBar';
 import MapFilterPanel from '../dashboard/MapFilterPanel';
 import VehicleCard from '../vehicle/VehicleCard';
-
-/* Agrega o quita un valor de la selección de un filtro */
-function toggleValue<T>(values: T[], value: T): T[] {
-  return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
-}
+import { toggleExclusive } from '../../lib/filterOptions';
 
 /* Vuela hacia un vehículo cuando se selecciona */
 function FlyToVehicle({ lat, lng }: { lat: number; lng: number }) {
@@ -128,17 +124,28 @@ export default function FleetMap() {
     setShowFilters((prev) => !prev);
   }, []);
 
-  const handleStatusToggle = useCallback((status: VehicleStatus) => {
-    setSelectedStatuses((prev) => toggleValue(prev, status));
-  }, []);
+  /* Se filtra por una sola categoría a la vez: marcar en una suelta las marcas de
+     las otras dos, aunque sus secciones sigan a la vista */
+  const applyToggle = useCallback(
+    (category: Exclude<ColorCategory, null>, value: VehicleStatus | BatteryLevel | VehicleType) => {
+      const next = toggleExclusive(
+        { statuses: selectedStatuses, batteryLevels: selectedBatteryLevels, types: selectedTypes },
+        category,
+        value
+      );
 
-  const handleBatteryToggle = useCallback((level: BatteryLevel) => {
-    setSelectedBatteryLevels((prev) => toggleValue(prev, level));
-  }, []);
+      setSelectedStatuses(next.statuses);
+      setSelectedBatteryLevels(next.batteryLevels);
+      setSelectedTypes(next.types);
+    },
+    [selectedStatuses, selectedBatteryLevels, selectedTypes]
+  );
 
-  const handleTypeToggle = useCallback((type: VehicleType) => {
-    setSelectedTypes((prev) => toggleValue(prev, type));
-  }, []);
+  const handleStatusToggle = useCallback((status: VehicleStatus) => applyToggle('status', status), [applyToggle]);
+
+  const handleBatteryToggle = useCallback((level: BatteryLevel) => applyToggle('battery', level), [applyToggle]);
+
+  const handleTypeToggle = useCallback((type: VehicleType) => applyToggle('type', type), [applyToggle]);
 
   const handleClearFilters = useCallback(() => {
     setSearchQuery('');

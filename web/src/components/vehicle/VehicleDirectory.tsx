@@ -1,19 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useVehicles } from "../../hooks/useVehicles";
-import type { BatteryLevel, Vehicle, VehicleStatus, VehicleType } from "../../types/vehicle";
-import { getStatusLabel, getTypeLabel, hasActiveFilters, matchesVehicleFilters } from "../../types/vehicle";
+import type { BatteryLevel, ColorCategory, Vehicle, VehicleStatus, VehicleType } from "../../types/vehicle";
+import { hasActiveFilters, matchesVehicleFilters } from "../../types/vehicle";
+import { FILTER_CATEGORIES, toggleExclusive } from "../../lib/filterOptions";
+import FilterPanel from "../dashboard/FilterPanel";
 import VehicleCard from "./VehicleCard";
 
-const statusOptions: VehicleStatus[] = ["en-ruta", "cargando", "mantenimiento"];
-const typeOptions: VehicleType[] = ["automovil", "van", "camion", "motocicleta"];
-const batteryOptions: { key: BatteryLevel; label: string }[] = [
-  { key: "high", label: "Alto (70%+)" },
-  { key: "medium", label: "Media (30% - 69%)" },
-  { key: "low", label: "Bajo (0% - 29%)" },
-];
-
 const focusRing = "focus-visible:ring-2 focus-visible:ring-[#2563EB]/40";
-const selectClassName = `h-[30px] rounded border-0 bg-[#616161] px-2.5 text-[11px] font-bold text-white outline-none ${focusRing}`;
+const PANEL_ID = "filtros-unidades";
 
 interface VehicleDirectoryProps {
   onVehicleClick?: (vehicle: Vehicle) => void;
@@ -22,20 +16,24 @@ interface VehicleDirectoryProps {
 export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryProps) {
   const vehicles = useVehicles();
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<VehicleStatus | "">("");
-  const [battery, setBattery] = useState<BatteryLevel | "">("");
-  const [type, setType] = useState<VehicleType | "">("");
+  /* Categoría que muestra el contenedor de opciones; los tres filtros de la fila
+     cambian su contenido, no lo despliegan */
+  const [activeCategory, setActiveCategory] = useState<Exclude<ColorCategory, null>>("status");
+  /* Arreglo vacío = esa categoría no filtra; dentro de la categoría activa los
+     valores se acumulan (lo resuelve matchesVehicleFilters) */
+  const [selectedStatuses, setSelectedStatuses] = useState<VehicleStatus[]>([]);
+  const [selectedBatteryLevels, setSelectedBatteryLevels] = useState<BatteryLevel[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<VehicleType[]>([]);
   const [highlightedVehicleId, setHighlightedVehicleId] = useState<string | null>(null);
 
-  // Los selects son de valor único; el helper compartido trabaja con arreglos
   const filters = useMemo(
     () => ({
       query,
-      statuses: status ? [status] : [],
-      batteryLevels: battery ? [battery] : [],
-      types: type ? [type] : [],
+      statuses: selectedStatuses,
+      batteryLevels: selectedBatteryLevels,
+      types: selectedTypes,
     }),
-    [query, status, battery, type]
+    [query, selectedStatuses, selectedBatteryLevels, selectedTypes]
   );
 
   const hasFilters = hasActiveFilters(filters);
@@ -45,11 +43,39 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
     [vehicles, filters]
   );
 
+  const clearSelections = () => {
+    setSelectedStatuses([]);
+    setSelectedBatteryLevels([]);
+    setSelectedTypes([]);
+  };
+
+  /* Se filtra por una sola categoría a la vez (misma regla que el panel del mapa) */
+  const applyToggle = (
+    category: Exclude<ColorCategory, null>,
+    value: VehicleStatus | BatteryLevel | VehicleType
+  ) => {
+    const next = toggleExclusive(
+      { statuses: selectedStatuses, batteryLevels: selectedBatteryLevels, types: selectedTypes },
+      category,
+      value
+    );
+
+    setSelectedStatuses(next.statuses);
+    setSelectedBatteryLevels(next.batteryLevels);
+    setSelectedTypes(next.types);
+  };
+
+  /* Se filtra por una sola categoría a la vez: al cambiar de filtro se sueltan las
+     marcas del anterior, para no arrastrar un cruce que ya no se ve en pantalla */
+  const handleCategorySelect = (category: Exclude<ColorCategory, null>) => {
+    if (category === activeCategory) return;
+    setActiveCategory(category);
+    clearSelections();
+  };
+
   const clearFilters = () => {
     setQuery("");
-    setStatus("");
-    setBattery("");
-    setType("");
+    clearSelections();
   };
 
   useEffect(() => {
@@ -78,20 +104,44 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
         Consulta el estado operativo, la batería, la ubicación y las alertas de cada unidad de la flota.
       </p>
 
-      <div className="mb-5 mt-4 flex flex-wrap items-center gap-2">
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar Unidad" aria-label="Buscar unidad" className={`h-[30px] w-full max-w-[340px] rounded border border-[#dfdfdf] bg-white px-3 text-[11px] outline-none focus:border-[#2f75ff] ${focusRing}`} />
-        <select value={status} onChange={(event) => setStatus(event.target.value as VehicleStatus | "")} aria-label="Estado operativo" className={selectClassName}>
-          <option value="">Estado Operativo</option>
-          {statusOptions.map((option) => <option key={option} value={option}>{getStatusLabel(option)}</option>)}
-        </select>
-        <select value={battery} onChange={(event) => setBattery(event.target.value as BatteryLevel | "")} aria-label="Nivel de batería" className={selectClassName}>
-          <option value="">Nivel de Batería</option>
-          {batteryOptions.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}
-        </select>
-        <select value={type} onChange={(event) => setType(event.target.value as VehicleType | "")} aria-label="Tipo de unidad" className={selectClassName}>
-          <option value="">Tipo de Unidad</option>
-          {typeOptions.map((option) => <option key={option} value={option}>{getTypeLabel(option)}</option>)}
-        </select>
+      <div className="mb-5 mt-4 flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar Unidad" aria-label="Buscar unidad" className={`h-[30px] w-full max-w-[340px] rounded border border-[#dfdfdf] bg-white px-3 text-[11px] outline-none focus:border-[#2f75ff] ${focusRing}`} />
+
+          {FILTER_CATEGORIES.map((category) => {
+            const isActive = activeCategory === category.key;
+
+            return (
+              <button
+                key={category.key}
+                type="button"
+                aria-pressed={isActive}
+                aria-controls={PANEL_ID}
+                onClick={() => handleCategorySelect(category.key)}
+                className={`flex h-[30px] items-center rounded-[5px] px-3 text-[11px] font-bold outline-none transition-colors ${focusRing} ${
+                  isActive ? "bg-[#616161] text-white" : "bg-[#F2F4F7] text-[#616161] hover:bg-[#E5E7EB]"
+                }`}
+              >
+                {category.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <FilterPanel
+          id={PANEL_ID}
+          vehicles={vehicles}
+          visibleCount={filteredVehicles.length}
+          activeCategory={activeCategory}
+          selectedStatuses={selectedStatuses}
+          selectedBatteryLevels={selectedBatteryLevels}
+          selectedTypes={selectedTypes}
+          onStatusToggle={(status) => applyToggle("status", status)}
+          onBatteryToggle={(level) => applyToggle("battery", level)}
+          onTypeToggle={(type) => applyToggle("type", type)}
+          onClearFilters={clearFilters}
+          hasFilters={hasFilters}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
