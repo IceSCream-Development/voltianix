@@ -68,7 +68,8 @@ export default function LoginForm() {
               type={showPassword ? 'text' : 'password'}
               required
               autoComplete="current-password"
-              placeholder="Ingresa tu contraseña"
+              // placeholder="Ingresa tu contraseña"
+              placeholder="voltianix123"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               className="h-12 w-full rounded-2xl border border-[#E6E6E6] bg-[#F9F9F9] px-4 pr-12 text-sm text-[#1E1E1E] outline-none transition-colors focus:border-[#16A34A] focus:bg-white"
@@ -103,11 +104,11 @@ export default function LoginForm() {
         </button>
       </form>
 
-      <div className="mt-6 rounded-[26px] border border-dashed border-[#E6E6E6] bg-[#F9F9F9] p-5 text-sm text-[#616161]">
+      {/* <div className="mt-6 rounded-[26px] border border-dashed border-[#E6E6E6] bg-[#F9F9F9] p-5 text-sm text-[#616161]">
         <p className="font-semibold text-[#1E1E1E]">Acceso temporal de prueba</p>
         <p className="mt-2">Correo: <span className="font-medium text-[#1E1E1E]">{TEMP_USER_CREDENTIALS.email}</span></p>
         <p>Contraseña: <span className="font-medium text-[#1E1E1E]">{TEMP_USER_CREDENTIALS.password}</span></p>
-      </div>
+      </div> */}
     </div>
   );
 }
