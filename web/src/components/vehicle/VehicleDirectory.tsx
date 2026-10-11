@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useVehicles } from "../../hooks/useVehicles";
 import type { BatteryLevel, ColorCategory, Vehicle, VehicleStatus, VehicleType } from "../../types/vehicle";
 import { hasActiveFilters, matchesVehicleFilters } from "../../types/vehicle";
@@ -16,9 +16,9 @@ interface VehicleDirectoryProps {
 export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryProps) {
   const vehicles = useVehicles();
   const [query, setQuery] = useState("");
-  /* Categoría que muestra el contenedor de opciones; los tres filtros de la fila
-     cambian su contenido, no lo despliegan */
-  const [activeCategory, setActiveCategory] = useState<Exclude<ColorCategory, null>>("status");
+  /* Categoría cuyo popover de opciones está abierto */
+  const [activeCategory, setActiveCategory] = useState<Exclude<ColorCategory, null> | null>(null);
+  const filterControlsRef = useRef<HTMLDivElement>(null);
   /* Arreglo vacío = esa categoría no filtra; dentro de la categoría activa los
      valores se acumulan (lo resuelve matchesVehicleFilters) */
   const [selectedStatuses, setSelectedStatuses] = useState<VehicleStatus[]>([]);
@@ -68,10 +68,25 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
   /* Se filtra por una sola categoría a la vez: al cambiar de filtro se sueltan las
      marcas del anterior, para no arrastrar un cruce que ya no se ve en pantalla */
   const handleCategorySelect = (category: Exclude<ColorCategory, null>) => {
-    if (category === activeCategory) return;
+    if (category === activeCategory) {
+      setActiveCategory(null);
+      return;
+    }
+
     setActiveCategory(category);
     clearSelections();
   };
+
+  useEffect(() => {
+    const handleOutsideClick = (event: PointerEvent) => {
+      if (!filterControlsRef.current?.contains(event.target as Node)) {
+        setActiveCategory(null);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleOutsideClick);
+    return () => document.removeEventListener("pointerdown", handleOutsideClick);
+  }, []);
 
   const clearFilters = () => {
     setQuery("");
@@ -104,7 +119,7 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
         Consulta el estado operativo, la batería, la ubicación y las alertas de cada unidad de la flota.
       </p>
 
-      <div className="mb-5 mt-4 flex flex-col gap-2">
+      <div ref={filterControlsRef} className="relative z-20 mb-5 mt-4 flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar Unidad" aria-label="Buscar unidad" className={`h-[30px] w-full max-w-[340px] rounded border border-[#dfdfdf] bg-white px-3 text-[11px] outline-none focus:border-[#2f75ff] ${focusRing}`} />
 
@@ -128,20 +143,22 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
           })}
         </div>
 
-        <FilterPanel
-          id={PANEL_ID}
-          vehicles={vehicles}
-          visibleCount={filteredVehicles.length}
-          activeCategory={activeCategory}
-          selectedStatuses={selectedStatuses}
-          selectedBatteryLevels={selectedBatteryLevels}
-          selectedTypes={selectedTypes}
-          onStatusToggle={(status) => applyToggle("status", status)}
-          onBatteryToggle={(level) => applyToggle("battery", level)}
-          onTypeToggle={(type) => applyToggle("type", type)}
-          onClearFilters={clearFilters}
-          hasFilters={hasFilters}
-        />
+        {activeCategory && (
+          <FilterPanel
+            id={PANEL_ID}
+            vehicles={vehicles}
+            visibleCount={filteredVehicles.length}
+            activeCategory={activeCategory}
+            selectedStatuses={selectedStatuses}
+            selectedBatteryLevels={selectedBatteryLevels}
+            selectedTypes={selectedTypes}
+            onStatusToggle={(status) => applyToggle("status", status)}
+            onBatteryToggle={(level) => applyToggle("battery", level)}
+            onTypeToggle={(type) => applyToggle("type", type)}
+            onClearFilters={clearFilters}
+            hasFilters={hasFilters}
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

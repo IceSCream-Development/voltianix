@@ -9,7 +9,7 @@ interface FilterPanelProps {
   vehicles: Vehicle[];
   /* Unidades que quedan tras aplicar búsqueda y filtros */
   visibleCount: number;
-  /* Categoría cuyas opciones se muestran; el contenedor no se cierra nunca */
+  /* Categoría cuyas opciones se muestran en el popover */
   activeCategory: Category;
   id?: string;
   selectedStatuses: VehicleStatus[];
@@ -22,8 +22,8 @@ interface FilterPanelProps {
   hasFilters: boolean;
 }
 
-/* Opciones de la categoría activa, en vertical dentro de un contenedor fijo:
-   los tres filtros de la fila sólo cambian su contenido, no lo despliegan. */
+/* Las opciones aparecen en un popover para que cambiar de categoría no mueva
+   el contenido de la página. */
 export default function FilterPanel({
   vehicles,
   visibleCount,
@@ -78,30 +78,33 @@ export default function FilterPanel({
   };
 
   return (
-    <div id={id} className="w-full max-w-[340px] overflow-hidden rounded-[10px] border border-[#e0e0e0] bg-white shadow-sm">
-      <div className="flex items-center justify-between gap-2 border-b border-[#e0e0e0] px-3 py-2">
-        <div>
-          <h3 className="text-[11px] font-semibold text-[#1E1E1E]">Unidades Visibles</h3>
-          <p className="text-[11px] font-semibold tabular-nums text-[#616161]">
+    <div
+      id={id}
+      className="absolute left-0 top-full mt-1.5 w-full max-w-[340px] overflow-hidden rounded-[10px] border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(30,30,30,0.12)]"
+    >
+      <div className="flex items-center justify-between gap-2 px-2.5 pb-1 pt-2.5">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#616161]">Visibles</span>
+          <span className="rounded-[5px] bg-[#EEF3FF] px-1.5 py-0.5 text-[11px] font-bold tabular-nums text-[#374D7E]">
             {visibleCount}/{metrics.total}
-          </p>
+          </span>
         </div>
         {hasFilters ? (
           <button
             type="button"
             onClick={onClearFilters}
-            className="rounded-[5px] border border-[#e0e0e0] px-2.5 py-1 text-[10px] font-semibold text-[#616161] outline-none transition-colors hover:border-[#2563EB] hover:text-[#2563EB] focus-visible:ring-2 focus-visible:ring-[#2563EB]/40"
+            className="shrink-0 rounded-[5px] px-1.5 py-0.5 text-[10px] font-semibold text-[#616161] outline-none transition-colors hover:bg-[#F2F4F7] hover:text-[#2563EB] focus-visible:ring-2 focus-visible:ring-[#2563EB]/40"
           >
             Limpiar
           </button>
         ) : (
-          <span className="rounded-[5px] bg-[#F2F4F7] px-2.5 py-1 text-[10px] font-semibold text-[#616161]">
+          <span className="shrink-0 rounded-[5px] bg-[#F2F4F7] px-1.5 py-0.5 text-[10px] font-semibold text-[#616161]">
             {activeLabel}
           </span>
         )}
       </div>
 
-      <div className="space-y-1 p-2">{renderRows()}</div>
+      <div className="grid grid-cols-2 gap-1 p-2">{renderRows()}</div>
     </div>
   );
 }
