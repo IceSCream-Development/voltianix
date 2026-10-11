@@ -77,7 +77,7 @@ export default function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword((value) => !value)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#616161] transition hover:text-[#1E1E1E]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#616161] transition hover:text-[#1E1E1E]"
               aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             >
               {showPassword ? (
@@ -98,7 +98,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-[5px] bg-[#2563EB] text-sm font-semibold text-white transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-12 w-full cursor-pointer items-center justify-center rounded-[5px] bg-[#2563EB] text-sm font-semibold text-white transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? 'Iniciando sesión…' : 'Iniciar sesión'}
         </button>

@@ -88,7 +88,7 @@ export default function Header({ currentPage = 'mapa' }: HeaderProps) {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-[5px] border border-[#E6E6E6] px-2.5 py-1 text-[11px] font-medium text-[#616161] transition hover:border-[#16A34A] hover:text-[#16A34A]"
+                className="cursor-pointer rounded-[5px] border border-[#E6E6E6] px-2.5 py-1 text-[11px] font-medium text-[#616161] transition hover:border-[#16A34A] hover:text-[#16A34A]"
               >
                 Salir
               </button>
@@ -96,7 +96,7 @@ export default function Header({ currentPage = 'mapa' }: HeaderProps) {
           ) : (
             <a
               href="/login"
-              className="inline-flex items-center gap-2 rounded-[5px] bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D4ED8]"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-[5px] bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D4ED8]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

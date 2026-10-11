@@ -93,7 +93,7 @@ export default function FilterPanel({
           <button
             type="button"
             onClick={onClearFilters}
-            className="shrink-0 rounded-[5px] px-1.5 py-0.5 text-[10px] font-semibold text-[#616161] outline-none transition-colors hover:bg-[#F2F4F7] hover:text-[#2563EB] focus-visible:ring-2 focus-visible:ring-[#2563EB]/40"
+            className="shrink-0 cursor-pointer rounded-[5px] px-1.5 py-0.5 text-[10px] font-semibold text-[#616161] outline-none transition-colors hover:bg-[#F2F4F7] hover:text-[#2563EB] focus-visible:ring-2 focus-visible:ring-[#2563EB]/40"
           >
             Limpiar
           </button>
@@ -127,7 +127,7 @@ function CheckRow({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`flex w-full items-center gap-2 rounded-[5px] px-2 py-1.5 text-left text-[11px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#2563EB]/40 ${
+      className={`flex w-full cursor-pointer items-center gap-2 rounded-[5px] px-2 py-1.5 text-left text-[11px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#2563EB]/40 ${
         selected ? 'bg-[#DFE8FC] text-[#374D7E]' : 'text-[#4E4E4E] hover:bg-[#F7F7F7]'
       }`}
     >

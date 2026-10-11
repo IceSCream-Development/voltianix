@@ -10,7 +10,7 @@ export default function SearchBar({ value, onChange, onMenuToggle, className = '
     <div className={`flex w-full max-w-[360px] items-center rounded-full border border-[#E6E6E6] bg-[#F8FAFC] px-2 py-2 shadow-sm transition-all focus-within:border-[#16A34A] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#16A34A]/10 ${className}`.trim()}>
       <button
         onClick={onMenuToggle}
-        className="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white"
+        className="ml-1 flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white"
         style={{ color: '#616161' }}
         aria-label="Menú de filtros"
       >

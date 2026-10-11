@@ -60,7 +60,7 @@ export default function MapFilterPanel({
           <button
             type="button"
             onClick={onClearFilters}
-            className="rounded-full border border-[#E6E6E6] px-3 py-1 text-xs font-semibold text-[#616161] transition-colors hover:border-[#2563EB] hover:text-[#2563EB]"
+            className="cursor-pointer rounded-full border border-[#E6E6E6] px-3 py-1 text-xs font-semibold text-[#616161] transition-colors hover:border-[#2563EB] hover:text-[#2563EB]"
           >
             Limpiar
           </button>
@@ -190,7 +190,7 @@ function FilterRow({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-1.5 text-left transition-all duration-200 ${
+      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg border px-2.5 py-1.5 text-left transition-all duration-200 ${
         selected
           ? "border-[#D7DBE3] bg-[#F8FAFC] shadow-sm"
           : "border-transparent bg-white hover:border-[#E6E6E6] hover:bg-[#F8FAFC]"

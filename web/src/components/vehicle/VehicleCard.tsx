@@ -78,7 +78,7 @@ export default function VehicleCard({
                 event.stopPropagation();
                 onClose();
               }}
-              className="grid h-5 w-5 place-items-center rounded-full text-[#616161] transition-colors hover:bg-gray-100"
+              className="grid h-5 w-5 cursor-pointer place-items-center rounded-full text-[#616161] transition-colors hover:bg-gray-100"
               aria-label="Cerrar tarjeta"
             >
               <svg aria-hidden="true" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -114,7 +114,7 @@ export default function VehicleCard({
             event.stopPropagation();
             onViewDetails(vehicle.id);
           }}
-          className="mt-3 w-full rounded-[5px] bg-[#2563EB] py-1.5 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
+          className="group mt-3 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-[5px] bg-[#2563EB] py-1.5 text-[11px] font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]/40 focus-visible:ring-offset-2"
         >
           Ver Detalles
         </button>

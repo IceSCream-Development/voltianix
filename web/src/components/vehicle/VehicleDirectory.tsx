@@ -133,7 +133,7 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
                 aria-pressed={isActive}
                 aria-controls={PANEL_ID}
                 onClick={() => handleCategorySelect(category.key)}
-                className={`flex h-[30px] items-center rounded-[5px] px-3 text-[11px] font-bold outline-none transition-colors ${focusRing} ${
+                className={`flex h-[30px] cursor-pointer items-center rounded-[5px] px-3 text-[11px] font-bold outline-none transition-colors ${focusRing} ${
                   isActive ? "bg-[#616161] text-white" : "bg-[#F2F4F7] text-[#616161] hover:bg-[#E5E7EB]"
                 }`}
               >
@@ -176,7 +176,7 @@ export default function VehicleDirectory({ onVehicleClick }: VehicleDirectoryPro
             {hasFilters ? (
               <>
                 <p>Ninguna unidad coincide con la búsqueda o los filtros. Quita algún filtro para ver más unidades.</p>
-                <button type="button" onClick={clearFilters} className={`rounded-[5px] bg-[#2563EB] px-4 py-1.5 text-xs font-semibold text-white outline-none transition-opacity hover:opacity-90 ${focusRing}`}>
+                <button type="button" onClick={clearFilters} className={`cursor-pointer rounded-[5px] bg-[#2563EB] px-4 py-1.5 text-xs font-semibold text-white outline-none transition-opacity hover:opacity-90 ${focusRing}`}>
                   Limpiar filtros
                 </button>
               </>
