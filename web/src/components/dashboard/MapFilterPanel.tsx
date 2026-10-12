@@ -40,11 +40,11 @@ export default function MapFilterPanel({
   /* Al elegir una opción se filtra y, además, se colorean los marcadores por esa
      categoría: así el mapa siempre explica visualmente lo que estás filtrando. */
   const handleSelect = (category: Category, key: string) => {
+    onCategoryChange(category);
+
     if (category === 'status') onStatusToggle(key as VehicleStatus);
     else if (category === 'battery') onBatteryToggle(key as BatteryLevel);
     else onTypeToggle(key as VehicleType);
-
-    onCategoryChange(category);
   };
 
   return (

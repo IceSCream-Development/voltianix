@@ -124,6 +124,16 @@ export default function FleetMap() {
     setShowFilters((prev) => !prev);
   }, []);
 
+  const handleCategoryChange = useCallback((category: ColorCategory) => {
+    if (category !== activeCategory) {
+      setSelectedStatuses([]);
+      setSelectedBatteryLevels([]);
+      setSelectedTypes([]);
+    }
+
+    setActiveCategory(category);
+  }, [activeCategory]);
+
   /* Se filtra por una sola categoría a la vez: marcar en una suelta las marcas de
      las otras dos, aunque sus secciones sigan a la vista */
   const applyToggle = useCallback(
@@ -202,7 +212,7 @@ export default function FleetMap() {
               vehicles={vehicles}
               visibleCount={filteredVehicles.length}
               activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
+              onCategoryChange={handleCategoryChange}
               selectedStatuses={selectedStatuses}
               selectedBatteryLevels={selectedBatteryLevels}
               selectedTypes={selectedTypes}
