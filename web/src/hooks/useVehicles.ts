@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Vehicle, VehicleStatus, VehicleType } from '../types/vehicle';
 import { db } from '../lib/firebase';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, type GeoPoint } from 'firebase/firestore';
 import { mockVehicles } from '../data/mock/vehicles';
 
 /* ------------------------------------------------------------------ */
@@ -12,33 +12,45 @@ import { mockVehicles } from '../data/mock/vehicles';
 const USE_MOCK = import.meta.env.PUBLIC_MOCK_DATA !== '1';
 
 /* ------------------------------------------------------------------ */
-/* Estructura real de un documento en Firestore (colección "vehicles") */
+/* Estructura de un documento en Firestore (colección "vehicles").     */
+/* La escribe voltianix_simulator; ver su README para el esquema.      */
 /* ------------------------------------------------------------------ */
 export interface FirestoreVehicle {
-  vehicleId: string;
-  batteryLevel: number;
-  latitude: number;
-  longitude: number;
-  speedKmh: number;
+  name?: string;
+  driver?: string;
+  model?: string;
+  type?: string;
   status: string;
+  battery?: number;
+  /* Autonomía con 100 % de carga */
+  rangeKm?: number;
+  location?: GeoPoint;
+  address?: string;
+  speedKmh?: number;
   lastUpdate: { seconds: number; nanoseconds: number } | Date | null;
 }
 
 /* ------------------------------------------------------------------ */
-/* Valores por defecto para campos que Firestore aún no tiene          */
+/* Valores por defecto para campos que falten en el documento          */
 /* ------------------------------------------------------------------ */
 const DEFAULT_VALUES = {
   driver: 'Sin asignar',
   model: 'Desconocido',
   type: 'automovil' as VehicleType,
-  autonomy: 100,
+  rangeKm: 100,
   address: 'Ubicación no disponible',
 };
+
+const VEHICLE_TYPES: VehicleType[] = ['automovil', 'van', 'camion', 'motocicleta'];
+
+function isVehicleType(value: unknown): value is VehicleType {
+  return VEHICLE_TYPES.includes(value as VehicleType);
+}
 
 /* ------------------------------------------------------------------ */
 /* Adapter: convierte un documento de Firestore a la interfaz Vehicle  */
 /* ------------------------------------------------------------------ */
-function mapFirestoreToVehicle(doc: FirestoreVehicle): Vehicle {
+function mapFirestoreToVehicle(id: string, doc: FirestoreVehicle): Vehicle {
   const status: VehicleStatus =
     doc.status === 'en_ruta' ? 'en-ruta'
     : doc.status === 'cargando' ? 'cargando'
@@ -59,19 +71,22 @@ function mapFirestoreToVehicle(doc: FirestoreVehicle): Vehicle {
     else lastUpdate = `${Math.floor(seconds / 86400)} d`;
   }
 
+  const battery = doc.battery ?? 0;
+  const rangeKm = doc.rangeKm ?? DEFAULT_VALUES.rangeKm;
+
   return {
-    id: doc.vehicleId,
-    label: doc.vehicleId,
-    driver: DEFAULT_VALUES.driver,
-    model: DEFAULT_VALUES.model,
-    type: DEFAULT_VALUES.type,
+    id,
+    label: doc.name ?? id,
+    driver: doc.driver ?? DEFAULT_VALUES.driver,
+    model: doc.model ?? DEFAULT_VALUES.model,
+    type: isVehicleType(doc.type) ? doc.type : DEFAULT_VALUES.type,
     status,
-    battery: doc.batteryLevel,
-    autonomy: DEFAULT_VALUES.autonomy,
+    battery,
+    autonomy: Math.round((battery * rangeKm) / 100),
     location: {
-      lat: doc.latitude,
-      lng: doc.longitude,
-      address: DEFAULT_VALUES.address,
+      lat: doc.location?.latitude ?? 0,
+      lng: doc.location?.longitude ?? 0,
+      address: doc.address ?? DEFAULT_VALUES.address,
     },
     lastUpdate,
   };
@@ -94,7 +109,7 @@ export function useVehicles(): Vehicle[] {
       collection(db, 'vehicles'),
       (snapshot) => {
         const list = snapshot.docs.map((docSnap) =>
-          mapFirestoreToVehicle(docSnap.data() as FirestoreVehicle)
+          mapFirestoreToVehicle(docSnap.id, docSnap.data() as FirestoreVehicle)
         );
         setVehicles(list);
       },
